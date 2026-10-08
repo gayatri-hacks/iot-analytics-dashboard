@@ -28,8 +28,8 @@ function anomalyIndexes(readings, field) {
   const center = median(values);
   const mad = median(values.map((value) => Math.abs(value - center)));
 
-  // MAD zero means there is no meaningful robust spread to compare against.
-  if (mad === 0) return new Set();
+  // With one repeated baseline and a different value, the zero MAD itself is the signal.
+  if (mad === 0) return new Set(values.map((value, index) => (value !== center ? index : null)).filter((index) => index !== null));
   return new Set(
     values
       .map((value, index) => ({ index, score: (0.6745 * Math.abs(value - center)) / mad }))
